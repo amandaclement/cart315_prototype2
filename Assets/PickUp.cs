@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 
+// copied from github backup (accidentally broke code in last edit)
+
 public class PickUp : MonoBehaviour
 {
     public GameObject sledgehammer;
@@ -84,14 +86,14 @@ public class PickUp : MonoBehaviour
 
     void Explode()
     {
-      // play all particle systems to create explosion (trigger when test tube is thrown into pot)
-      trailsBlack.Play();
-      trailsWhite.Play();
-      shower.Play();
-      fireball.Play();
-      dust.Play();
-      shockwave.Play();
-      smokeBlack.Play();
+        // play all particle systems to create explosion (trigger when test tube is thrown into pot)
+        trailsBlack.Play();
+        trailsWhite.Play();
+        shower.Play();
+        fireball.Play();
+        dust.Play();
+        shockwave.Play();
+        smokeBlack.Play();
     }
 
     void gameOverLoseBomb()
@@ -150,7 +152,8 @@ public class PickUp : MonoBehaviour
             {
                 instruction.text = "";
             }
-        } else { instruction.text = "";  }
+        }
+        else { instruction.text = ""; }
         // END RADIO
 
         // TEST TUBE
@@ -164,10 +167,10 @@ public class PickUp : MonoBehaviour
             {
                 Debug.Log("picked up test tube");
                 // unparenting all other objects
-                sledgehammer.transform.parent = null; 
-                hammer.transform.parent = null; 
-                axe.transform.parent = null; 
-                flaregun.transform.parent = null; 
+                sledgehammer.transform.parent = null;
+                hammer.transform.parent = null;
+                axe.transform.parent = null;
+                flaregun.transform.parent = null;
 
                 // making test tube child of player
                 testtube.transform.parent = this.transform;
@@ -211,7 +214,7 @@ public class PickUp : MonoBehaviour
                 flaregun.transform.parent = null;
 
                 // making sledgehammer child of player
-                sledgehammer.transform.parent = this.transform; 
+                sledgehammer.transform.parent = this.transform;
                 sledgehammer.transform.localPosition = new Vector3(0.15f, 0.2f, 0.5f); // positioning the sledgehammer
                 sledgehammer.transform.localRotation = Quaternion.Euler(-150, 8, -80); // angling it
                 holdingSledgehammer = true; // make boolean true
@@ -260,8 +263,8 @@ public class PickUp : MonoBehaviour
                 // making hammer child of player
                 hammer.transform.parent = this.transform;
                 // positioning/angling the hammer
-                hammer.transform.localPosition = new Vector3(0.15f, 0.2f, 0.5f); 
-                hammer.transform.localRotation = Quaternion.Euler(-150, 8, -80); 
+                hammer.transform.localPosition = new Vector3(0.15f, 0.2f, 0.5f);
+                hammer.transform.localRotation = Quaternion.Euler(-150, 8, -80);
                 holdingHammer = true; // make boolean true
                 armed = true;
                 tool.text = "Hammer"; // update tool text
@@ -343,10 +346,10 @@ public class PickUp : MonoBehaviour
             instruction.text = "Press R to destroy box"; // update instruction text
             if (Input.GetKeyUp(KeyCode.R))
             {
-                    boxCollider.enabled = false;
-                    wholeCrate.enabled = false;
-                    fracturedCrate.SetActive(true);
-                    crashAudioClip.Play();
+                boxCollider.enabled = false;
+                wholeCrate.enabled = false;
+                fracturedCrate.SetActive(true);
+                crashAudioClip.Play();
             }
         }
 
@@ -382,3 +385,4 @@ public class PickUp : MonoBehaviour
         }
     }
 }
+
