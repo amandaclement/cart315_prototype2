@@ -12,11 +12,24 @@ public class battery : MonoBehaviour
     public Text life;
     public Light flashLight;
 
+    public GameObject blackOut;
+    public GameObject youLose;
+    public GameObject batteryDied;
+
+    void gameOverLoseBattery()
+    {
+        blackOut.SetActive(true);
+        youLose.SetActive(true);
+        batteryDied.SetActive(true);
+    }
+
     // Start is called before the first frame update
     void Start()
     {
         InvokeRepeating("depleteBattery", 2f, 2f); // 2f for speed of battery depletion
-        flashLight = GetComponent<Light>();
+        blackOut.SetActive(false);
+        youLose.SetActive(false);
+        batteryDied.SetActive(false);
     }
 
     void depleteBattery()
@@ -27,7 +40,7 @@ public class battery : MonoBehaviour
         }
         if (batteryLife == 0) // at zero, flashLight intensity goes to 0
         {
-            flashLight.intensity = 0;
+            Invoke("gameOverLoseBattery", 1); // black out screen (game over)
         }
         life.text = batteryLife.ToString() + "%"; // displaying flashlight battery life on screen
     }

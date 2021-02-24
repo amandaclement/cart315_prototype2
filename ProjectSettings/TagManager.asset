@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - invisibleBox
+  - crateEmpty
   layers:
   - Default
   - TransparentFX

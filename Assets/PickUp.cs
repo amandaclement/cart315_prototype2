@@ -11,7 +11,16 @@ public class PickUp : MonoBehaviour
     public GameObject testtube;
     public GameObject radio;
     public GameObject invisibleBox;
-    public GameObject blackOut; // for game over screen
+
+    public GameObject blackOut; // for game over screen (lose)
+    public GameObject whiteOut; // for game over screen (win)
+    public GameObject youLose;
+    public GameObject youWin;
+    public GameObject bombDied;
+    public GameObject batteryDied;
+    public GameObject flareSave;
+    public GameObject instructions;
+    public GameObject instructionsClose;
 
     // particle systems to create explosion
     public ParticleSystem trailsBlack;
@@ -34,12 +43,13 @@ public class PickUp : MonoBehaviour
     bool holdingFlaregun = false;
     bool holdingTesttube = false;
     bool radioTuned = false;
+    bool armed = false;
 
     // for updating text
     public Text tool;
     public Text instruction;
 
-    // crash crate
+    // crash crate (holding flare gun)
     public MeshRenderer wholeCrate;
     public BoxCollider boxCollider;
     public GameObject fracturedCrate;
@@ -52,7 +62,14 @@ public class PickUp : MonoBehaviour
 
     void Start()
     {
+        // hiding game over content
         blackOut.SetActive(false);
+        whiteOut.SetActive(false);
+        youLose.SetActive(false);
+        youWin.SetActive(false);
+        bombDied.SetActive(false);
+        batteryDied.SetActive(false);
+        flareSave.SetActive(false);
 
         // turning off particle systems for explosion
         trailsBlack.Stop();
@@ -62,6 +79,7 @@ public class PickUp : MonoBehaviour
         dust.Stop();
         shockwave.Stop();
         smokeBlack.Stop();
+
     }
 
     void Explode()
@@ -76,13 +94,27 @@ public class PickUp : MonoBehaviour
       smokeBlack.Play();
     }
 
-    void gameOver()
+    void gameOverLoseBomb()
     {
         blackOut.SetActive(true);
+        youLose.SetActive(true);
+        bombDied.SetActive(true);
+    }
+
+    void gameOverWin()
+    {
+        whiteOut.SetActive(true);
+        youWin.SetActive(true);
+        flareSave.SetActive(true);
     }
 
     void Update()
     {
+        if (Input.GetKeyUp(KeyCode.E)) // closing instructions
+        {
+            instructions.SetActive(false);
+            instructionsClose.SetActive(false);
+        }
         // get positions of player and objects to make sure they are within range before allowing player to pick them up
         Vector3 playerPosition;
         Vector3 sledgehammerPosition;
@@ -105,6 +137,8 @@ public class PickUp : MonoBehaviour
         if (Vector3.Distance(playerPosition, radioPosition) < range)
         {
             instruction.text = "Press Q to tune radio"; // update instruction text
+            instructions.SetActive(false);
+            instructionsClose.SetActive(false);
             if (Input.GetKeyUp(KeyCode.Q))
             {
                 Debug.Log("tuning radio");
@@ -152,11 +186,10 @@ public class PickUp : MonoBehaviour
             if (Input.GetKeyUp(KeyCode.R) && holdingTesttube)
             {
                 instruction.text = "";
-                // trigger explosion here
                 testtube.transform.parent = null; // unparenting the testube
                 testtube.transform.localPosition = new Vector3(0.15f, 0.2f, 0.5f); // position it randomly just so it's out of view (screen goes black anyway)
                 Invoke("Explode", 1); // trigger explosion after 1 second
-                Invoke("gameOver", 3); // black out screen (game over)
+                Invoke("gameOverLoseBomb", 2); // black out screen (game over)
             }
         }
         // END TEST TUBE
@@ -182,6 +215,7 @@ public class PickUp : MonoBehaviour
                 sledgehammer.transform.localPosition = new Vector3(0.15f, 0.2f, 0.5f); // positioning the sledgehammer
                 sledgehammer.transform.localRotation = Quaternion.Euler(-150, 8, -80); // angling it
                 holdingSledgehammer = true; // make boolean true
+                armed = true;
                 tool.text = "Sledgehammer"; // update tool text
             }
 
@@ -229,6 +263,7 @@ public class PickUp : MonoBehaviour
                 hammer.transform.localPosition = new Vector3(0.15f, 0.2f, 0.5f); 
                 hammer.transform.localRotation = Quaternion.Euler(-150, 8, -80); 
                 holdingHammer = true; // make boolean true
+                armed = true;
                 tool.text = "Hammer"; // update tool text
             }
 
@@ -276,6 +311,7 @@ public class PickUp : MonoBehaviour
                 axe.transform.localPosition = new Vector3(0.15f, 0.2f, 0.5f);
                 axe.transform.localRotation = Quaternion.Euler(-150, 8, -80);
                 holdingAxe = true; // make boolean true
+                armed = true;
                 tool.text = "Axe"; // update tool text
             }
 
@@ -301,8 +337,8 @@ public class PickUp : MonoBehaviour
         }
         // END AXE
 
-        // if box has been destroyed and player is within range, let them pick up flaregun by pressing E key
-        if ((Vector3.Distance(playerPosition, flaregunPosition) < range) && boxCollider.enabled == true)
+        // if played is armed and within range, let them destroy box nd pick up flaregun
+        if ((Vector3.Distance(playerPosition, flaregunPosition) < range) && boxCollider.enabled == true && armed)
         {
             instruction.text = "Press R to destroy box"; // update instruction text
             if (Input.GetKeyUp(KeyCode.R))
@@ -337,6 +373,11 @@ public class PickUp : MonoBehaviour
             if (holdingFlaregun)
             {
                 instruction.text = "Click to shoot & R to reload."; // update instruction text
+                if (Input.GetMouseButtonDown(0)) // if primary mouse button is clicked, flaregun has been shot and game ends (win)
+                {
+                    instruction.text = "";
+                    Invoke("gameOverWin", 3); // white out screen (game over)
+                }
             }
         }
     }
