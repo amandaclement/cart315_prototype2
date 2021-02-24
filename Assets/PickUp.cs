@@ -5,6 +5,8 @@ using System.Collections;
 public class PickUp : MonoBehaviour
 {
     public GameObject sledgehammer;
+    public GameObject hammer;
+    public GameObject axe;
     public GameObject flaregun;
     public GameObject testtube;
     public GameObject radio;
@@ -24,8 +26,11 @@ public class PickUp : MonoBehaviour
 
     // booleans to track player actions
     bool holdingSledgehammer = false;
+    bool holdingHammer = false;
+    bool holdingAxe = false;
     bool swungSledgehammer = false;
-    bool swing = false;
+    bool swungHammer = false;
+    bool swungAxe = false;
     bool holdingFlaregun = false;
     bool holdingTesttube = false;
     bool radioTuned = false;
@@ -81,16 +86,21 @@ public class PickUp : MonoBehaviour
         // get positions of player and objects to make sure they are within range before allowing player to pick them up
         Vector3 playerPosition;
         Vector3 sledgehammerPosition;
+        Vector3 hammerPosition;
+        Vector3 axePosition;
         Vector3 flaregunPosition;
         Vector3 testtubePosition;
         Vector3 radioPosition;
 
         playerPosition = this.transform.position;
         sledgehammerPosition = sledgehammer.transform.position;
+        hammerPosition = hammer.transform.position;
+        axePosition = axe.transform.position;
         flaregunPosition = flaregun.transform.position;
         testtubePosition = testtube.transform.position;
         radioPosition = radio.transform.position;
 
+        // RADIO
         // if player is within range, let them tune the radio by pressing Q key
         if (Vector3.Distance(playerPosition, radioPosition) < range)
         {
@@ -107,7 +117,9 @@ public class PickUp : MonoBehaviour
                 instruction.text = "";
             }
         } else { instruction.text = "";  }
+        // END RADIO
 
+        // TEST TUBE
         // if player is within range, let them pick up the test tube by pressing Q key
         if (Vector3.Distance(playerPosition, testtubePosition) < range)
         {
@@ -117,15 +129,21 @@ public class PickUp : MonoBehaviour
             if (Input.GetKeyUp(KeyCode.Q))
             {
                 Debug.Log("picked up test tube");
-                testtube.transform.parent = null; // unparenting the sledgehammer
-                flaregun.transform.parent = null; // unparenting the flaregun
-                testtube.transform.parent = this.transform; // making test tube child of player
-                testtube.transform.localPosition = new Vector3(0.15f, 0.5f, 0.5f); // positioning the test tube
-                testtube.transform.localRotation = Quaternion.Euler(-20, 0, 0); // angling it
+                // unparenting all other objects
+                sledgehammer.transform.parent = null; 
+                hammer.transform.parent = null; 
+                axe.transform.parent = null; 
+                flaregun.transform.parent = null; 
+
+                // making test tube child of player
+                testtube.transform.parent = this.transform;
+
+                // positioning/angling the test tube
+                testtube.transform.localPosition = new Vector3(0.15f, 0.5f, 0.5f);
+                testtube.transform.localRotation = Quaternion.Euler(-20, 0, 0);
                 holdingTesttube = true; // make boolean true
                 tool.text = "Test tube"; // update tool text
             }
-
             if (holdingTesttube)
             {
                 instruction.text = "Press R to throw into smoking pot"; // update instruction text
@@ -141,6 +159,9 @@ public class PickUp : MonoBehaviour
                 Invoke("gameOver", 3); // black out screen (game over)
             }
         }
+        // END TEST TUBE
+
+        // SLEDGEHAMMER
         // if player is within range, let them pick up sledgehammer by pressing Q key
         if (Vector3.Distance(playerPosition, sledgehammerPosition) < range)
         {
@@ -150,9 +171,14 @@ public class PickUp : MonoBehaviour
             if (Input.GetKeyUp(KeyCode.Q))
             {
                 Debug.Log("picked up sledgehammer");
-                testtube.transform.parent = null; // unparenting the test tube
-                flaregun.transform.parent = null; // unparenting the flare gun
-                sledgehammer.transform.parent = this.transform; // making sledgehammer child of player
+                // unparenting all other objects
+                testtube.transform.parent = null;
+                hammer.transform.parent = null;
+                axe.transform.parent = null;
+                flaregun.transform.parent = null;
+
+                // making sledgehammer child of player
+                sledgehammer.transform.parent = this.transform; 
                 sledgehammer.transform.localPosition = new Vector3(0.15f, 0.2f, 0.5f); // positioning the sledgehammer
                 sledgehammer.transform.localRotation = Quaternion.Euler(-150, 8, -80); // angling it
                 holdingSledgehammer = true; // make boolean true
@@ -170,10 +196,7 @@ public class PickUp : MonoBehaviour
         {
             Debug.Log("swung sledgehammer");
             instruction.text = ""; // empty instruction text
-
-            //sledgehammer.transform.position = Vector3.Lerp(rotA, rotB, Mathf.PingPong(Time.time, 1));
             swungSledgehammer = true; // make boolean true
-            swing = true;
 
             // if player has swing sledgehammer within range of crate containing flaregun, destroy invisible box so that they can break crate open
             if ((Vector3.Distance(playerPosition, flaregunPosition) < range) && swungSledgehammer)
@@ -182,9 +205,104 @@ public class PickUp : MonoBehaviour
                 GameObject.Destroy(invisibleBox);
             }
         }
+        // END SLEDGEHAMMER
+
+        // HAMMER
+        // if player is within range, let them pick up hammer by pressing Q key
+        if (Vector3.Distance(playerPosition, hammerPosition) < range)
+        {
+            // instruction to pick up hammer
+            instruction.text = "Press Q to pick up hammer"; // update instruction text
+
+            if (Input.GetKeyUp(KeyCode.Q))
+            {
+                Debug.Log("picked up hammer");
+                // unparenting all other objects
+                testtube.transform.parent = null;
+                sledgehammer.transform.parent = null;
+                axe.transform.parent = null;
+                flaregun.transform.parent = null;
+
+                // making hammer child of player
+                hammer.transform.parent = this.transform;
+                // positioning/angling the hammer
+                hammer.transform.localPosition = new Vector3(0.15f, 0.2f, 0.5f); 
+                hammer.transform.localRotation = Quaternion.Euler(-150, 8, -80); 
+                holdingHammer = true; // make boolean true
+                tool.text = "Hammer"; // update tool text
+            }
+
+            if (holdingHammer)
+            {
+                instruction.text = "";
+            }
+        }
+
+        // if player is holding hammer and they press R key, swing it
+        if (Input.GetKeyUp(KeyCode.R) && holdingHammer)
+        {
+            Debug.Log("swung hammer");
+            instruction.text = ""; // empty instruction text
+            swungHammer = true; // make boolean true
+
+            // if player has swung hammer within range of crate containing flaregun, destroy invisible box so that they can break crate open
+            if ((Vector3.Distance(playerPosition, flaregunPosition) < range) && swungHammer)
+            {
+                Debug.Log("destroyed invisible box");
+                GameObject.Destroy(invisibleBox);
+            }
+        }
+        // END HAMMER
+
+        // AXE
+        // if player is within range, let them pick up axe by pressing Q key
+        if (Vector3.Distance(playerPosition, axePosition) < range)
+        {
+            // instruction to pick up hammer
+            instruction.text = "Press Q to pick up axe"; // update instruction text
+
+            if (Input.GetKeyUp(KeyCode.Q))
+            {
+                Debug.Log("picked up axe");
+                // unparenting all other objects
+                testtube.transform.parent = null;
+                hammer.transform.parent = null;
+                sledgehammer.transform.parent = null;
+                flaregun.transform.parent = null;
+
+                // making axe child of player
+                axe.transform.parent = this.transform;
+                // positioning/angling the axe
+                axe.transform.localPosition = new Vector3(0.15f, 0.2f, 0.5f);
+                axe.transform.localRotation = Quaternion.Euler(-150, 8, -80);
+                holdingAxe = true; // make boolean true
+                tool.text = "Axe"; // update tool text
+            }
+
+            if (holdingAxe)
+            {
+                instruction.text = "";
+            }
+        }
+
+        // if player is holding axe and they press R key, swing it
+        if (Input.GetKeyUp(KeyCode.R) && holdingAxe)
+        {
+            Debug.Log("swung axe");
+            instruction.text = ""; // empty instruction text
+            swungAxe = true; // make boolean true
+
+            // if player has swung axe within range of crate containing flaregun, destroy invisible box so that they can break crate open
+            if ((Vector3.Distance(playerPosition, flaregunPosition) < range) && swungAxe)
+            {
+                Debug.Log("destroyed invisible box");
+                GameObject.Destroy(invisibleBox);
+            }
+        }
+        // END AXE
 
         // if box has been destroyed and player is within range, let them pick up flaregun by pressing E key
-        if ((Vector3.Distance(playerPosition, flaregunPosition) < range) && boxCollider.enabled == true && holdingSledgehammer)
+        if ((Vector3.Distance(playerPosition, flaregunPosition) < range) && boxCollider.enabled == true)
         {
             instruction.text = "Press R to destroy box"; // update instruction text
             if (Input.GetKeyUp(KeyCode.R))
@@ -202,9 +320,12 @@ public class PickUp : MonoBehaviour
 
             if (Input.GetKeyUp(KeyCode.Q))
             {
-                instruction.text = "Press R to load"; // update instruction text
-                sledgehammer.transform.parent = null; // unparenting the sledgehammer
-                testtube.transform.parent = null; // unparenting the test tube
+                // unparenting all other tools
+                sledgehammer.transform.parent = null;
+                hammer.transform.parent = null;
+                axe.transform.parent = null;
+                testtube.transform.parent = null;
+
                 // sledgehammer.GetComponent<Rigidbody>().useGravity = true; // applying gravity so it falls to ground 
                 Debug.Log("picked up flaregun");
                 flaregun.transform.parent = this.transform; // making flaregun child of player
@@ -213,9 +334,9 @@ public class PickUp : MonoBehaviour
                 tool.text = "Flare gun"; // update tool text
                 holdingFlaregun = true;
             }
-            if (Input.GetKeyUp(KeyCode.R) && holdingFlaregun)
+            if (holdingFlaregun)
             {
-                instruction.text = "Use cursor to aim & click to shoot"; // update instruction text
+                instruction.text = "Click to shoot & R to reload."; // update instruction text
             }
         }
     }
